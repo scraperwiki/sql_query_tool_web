@@ -175,6 +175,7 @@ String.prototype.hashCode = function(){
 
 var meta = null
 var get_meta = function() {
+  // TODO: fix this to use blueprint.
   scraperwiki.sql.meta(function (response) {
     meta = response
     use_default_query_if_needed()
@@ -186,7 +187,7 @@ var get_meta = function() {
       })
       html += '</ul>'
       $('#schema').append(html)
-
+      // TODO: fix this to use blueprint.
       scraperwiki.sql("select * from " + table_name + " order by random() limit 10", function (response) {
         if (!response) {
           return
