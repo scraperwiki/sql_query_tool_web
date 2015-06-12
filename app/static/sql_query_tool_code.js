@@ -49,7 +49,6 @@ var real_save = function() {
   var code = editor.getValue()
   localStorage.setItem('sql_query_'+window.location.pathname, JSON.stringify(code))
 }
-var real_save_throttled = _.throttle(real_save, 750)
 
 var loaded_empty
 var load = function() {
@@ -71,7 +70,7 @@ var load = function() {
     editor.clearSelection()
     editor.focus()
     run()
-    editor.on('change', real_save_throttled)
+    editor.on('change', real_save)
   }
   //})
 }
@@ -80,7 +79,7 @@ var use_default_query_if_needed = function() {
     if (editor.getValue() == "") {
       use_default_query()
       run()
-      editor.on('change', real_save_throttled)
+      editor.on('change', real_save)
     }
   }
 }
