@@ -95,8 +95,8 @@ var use_default_query_if_needed = function() {
 var use_default_query = function() {
   table = Object.keys(meta.table)[0]
   cols = meta.table[table].columnNames
-  data = "select \n" +
-      "\t" + cols.slice(0, 3).join(",\n\t") + "\n" +
+  data =
+      cols.slice(0, 3).join(",") + "\n" +
       "from " + table + "\n"
   if (cols.length > 2) {
       data += "-- where " + cols[Math.min(cols.length, 2)] + " > \n" +
@@ -112,9 +112,9 @@ var use_group_query = function() {
   table = Object.keys(meta.table)[0]
   cols = meta.table[table].columnNames
   var col = Math.min(cols.length, 2)
-  data = "select \n" +
-      "\t" + cols[col] + ",\n" +
-      "\tcount(*) as c\n" +
+  data =
+      cols[col] + "," +
+      "count(*) as c\n" +
       "from " + table + "\n"
   data += "group by " + cols[col] + "\n"
   data += "order by c desc\n"
