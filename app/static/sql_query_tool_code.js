@@ -14,7 +14,7 @@ var real_run = function() {
 
   var code = editor.getValue()
   // TODO: replace with SQL blueprint
-  scraperwiki.sql(code, function (response) {
+  sqlSelect(code).done(function(response) {
       if (!response || response.length < 1) {
 	err("No data", "The table is empty")
       } else {
@@ -38,7 +38,7 @@ var real_run = function() {
 	$('#table').append($tbody)
       }
       show_not_loading()
-  }, function (response) {
+  }).fail(function (response) {
       err("Error in SQL", jQuery.parseJSON(response.responseText))
       show_not_loading()
   })
@@ -181,10 +181,32 @@ String.prototype.hashCode = function(){
     return hash;
 };
 
+
+var sqlSelect = function(query) {
+  var options;
+  options = {
+    url: window.selectEndpoint,
+    type: "GET",
+    dataType: "json",
+    data: { q: query, }
+  };
+  return $.ajax(options);
+}
+
+var sqlMeta = function() {
+  var options;
+  options = {
+    url: window.metaEndpoint,
+    type: "GET",
+    dataType: "json",
+  };
+  return $.ajax(options);
+};
+
 var meta = null
 var get_meta = function() {
   // TODO: fix this to use blueprint.
-  scraperwiki.sql.meta(function (response) {
+  sqlMeta().done(function(response) {
     meta = response
     use_default_query_if_needed()
 
@@ -196,7 +218,7 @@ var get_meta = function() {
       html += '</ul>'
       $('#schema').append(html)
       // TODO: fix this to use blueprint.
-      scraperwiki.sql("select * from " + table_name + " order by random() limit 10", function (response) {
+      sqlSelect("* from " + table_name + " order by random() limit 10").done(function (response) {
         if (!response) {
           return
         }
@@ -214,7 +236,7 @@ var get_meta = function() {
 	  txt += "</span>"
 	  $(code).append(" <span class='example'>" + txt + "</span>")
   	})
-       }, function (jqXHR, textStatus, errorThrown) { err("Error getting sample rows", textStatus, true) } )
+       }).fail(function (jqXHR, textStatus, errorThrown) { err("Error getting sample rows", textStatus, true) } )
     })
 
     var lastCursorPosition = -1
@@ -233,10 +255,13 @@ var get_meta = function() {
       editor.focus()
       lastCursorPosition = editor.getCursorPosition()
     })
-  }, function (jqXHR, textStatus, errorThrown) { err("Error getting schema", textStatus, true) } )
+  }).fail(function (jqXHR, textStatus, errorThrown) { err("Error getting schema", textStatus, true) } )
 }
 
+
 $(function() {
+  window.selectEndpoint = '../sql_backend/select'
+  window.metaEndpoint = '../sql_backend/meta'
   editor = ace.edit("editor")
   editor.setFontSize(16)
   editor.renderer.setShowGutter(false)
