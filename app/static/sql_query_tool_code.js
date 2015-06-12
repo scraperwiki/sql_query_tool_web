@@ -13,7 +13,6 @@ var real_run = function() {
   console.log("real_run called")
 
   var code = editor.getValue()
-  // TODO: replace with SQL blueprint
   sqlSelect(code).done(function(response) {
       if (!response || response.length < 1) {
 	err("No data", "The table is empty")
@@ -49,18 +48,11 @@ var real_save = function() {
 
   var code = editor.getValue()
   localStorage.setItem('sql_query_'+window.location.pathname, JSON.stringify(code))
-  //var cmd = "mkdir -p code; cat >code/query.sql.$$.new <<\"ENDOFSCRAPER\"\n" + code + "\nENDOFSCRAPER\n"
-  //cmd = cmd + "mv code/query.sql.$$.new code/query.sql"
-  /*scraperwiki.exec(cmd, function () {
-  }, function (jqXHR, textStatus, errorThrown) {
-    err("Error saving query", textStatus, true)
-  })*/
 }
 var real_save_throttled = _.throttle(real_save, 750)
 
 var loaded_empty
 var load = function() {
-  //scraperwiki.exec('mkdir -p code; touch code/query.sql; cat code/query.sql', function(data) {
   var data = ""
   var settings = localStorage.getItem('sql_query_'+window.location.pathname)
   if (settings != null) {
