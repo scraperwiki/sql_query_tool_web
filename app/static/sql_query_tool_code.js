@@ -44,36 +44,44 @@ var real_run = function() {
   })
 }
 
-// TODO: use localStorage
 var real_save = function() {
   console.log("real_save called")
 
   var code = editor.getValue()
-  var cmd = "mkdir -p code; cat >code/query.sql.$$.new <<\"ENDOFSCRAPER\"\n" + code + "\nENDOFSCRAPER\n"
-  cmd = cmd + "mv code/query.sql.$$.new code/query.sql"
-  scraperwiki.exec(cmd, function () {
+  localStorage.setItem('sql_query_'+window.location.pathname, JSON.stringify(code))
+  //var cmd = "mkdir -p code; cat >code/query.sql.$$.new <<\"ENDOFSCRAPER\"\n" + code + "\nENDOFSCRAPER\n"
+  //cmd = cmd + "mv code/query.sql.$$.new code/query.sql"
+  /*scraperwiki.exec(cmd, function () {
   }, function (jqXHR, textStatus, errorThrown) {
     err("Error saving query", textStatus, true)
-  })
+  })*/
 }
 var real_save_throttled = _.throttle(real_save, 750)
 
-// TODO: use localStorage
 var loaded_empty
 var load = function() {
-  scraperwiki.exec('mkdir -p code; touch code/query.sql; cat code/query.sql', function(data) {
-    data = data.replace(/\s\s*$/, '')
-    if (data == "") {
-      loaded_empty = true
-      use_default_query_if_needed()
-    } else {
-      editor.setValue(data)
-      editor.clearSelection()
-      editor.focus()
-      run()
-      editor.on('change', real_save_throttled)
+  //scraperwiki.exec('mkdir -p code; touch code/query.sql; cat code/query.sql', function(data) {
+  var data = ""
+  var settings = localStorage.getItem('sql_query_'+window.location.pathname)
+  if (settings != null) {
+    try {
+       var data = JSON.parse(settings)
+    } catch(e) {
+       // Deliberately empty.
     }
-  })
+  }
+  data = data.replace(/\s\s*$/, '')
+  if (data == "") {
+    loaded_empty = true
+    use_default_query_if_needed()
+  } else {
+    editor.setValue(data)
+    editor.clearSelection()
+    editor.focus()
+    run()
+    editor.on('change', real_save_throttled)
+  }
+  //})
 }
 var use_default_query_if_needed = function() {
   if (meta && loaded_empty) {
